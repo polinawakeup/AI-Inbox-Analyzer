@@ -1,10 +1,10 @@
 import { escapeHtml } from "../utils/escapeHtml.js";
 import { formatWhen } from "../utils/formatWhen.js";
-import { clampConfidence, confLabel } from "../utils/confidence.js";
 
 export function Modal({ isOpen, item, category }) {
   const hidden = isOpen ? "" : " hidden";
   const subject = escapeHtml(item?.subject || "Email details");
+
   const meta =
     item
       ? `${escapeHtml(item.from_name || "")} <${escapeHtml(item.from_email || "")}> • ${escapeHtml(
@@ -13,7 +13,6 @@ export function Modal({ isOpen, item, category }) {
       : "";
 
   const cat = escapeHtml(category || "—");
-  const conf = item ? `${Math.round(clampConfidence(item.confidence) * 100)}% (${confLabel(item.confidence)})` : "—";
   const reason = escapeHtml(item?.reason || "—");
   const action = escapeHtml(item?.suggested_action || "—");
   const attachments =
@@ -36,7 +35,6 @@ export function Modal({ isOpen, item, category }) {
           <div class="modal-card">
             <h4>Classification</h4>
             <div class="modal-text"><b>Category:</b> ${cat}</div>
-            <div class="modal-text"><b>Confidence:</b> ${escapeHtml(conf)}</div>
           </div>
 
           <div class="modal-card">
