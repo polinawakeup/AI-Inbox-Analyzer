@@ -1,4 +1,11 @@
-import { loadDashboardModel } from "../lib/data.js";
+import {
+  loadDashboardModel,
+  computeCountsFromBlocks,
+  sumCounts,
+  getSortedBlocks,
+  findItem,
+} from "../lib/data.js";
+
 import { qs, on } from "../lib/dom.js";
 import { KPIBar } from "./KPIBar.js";
 import { Panel } from "./Panel.js";
@@ -6,27 +13,6 @@ import { EmailCard } from "./EmailCard.js";
 import { Modal } from "./Modal.js";
 
 const DATA_URL = "./data/dashboard_view_model_v1.json";
-
-function blocksByCategory(blocks) {
-  const m = new Map();
-  for (const b of blocks || []) m.set(b.category, b);
-  return m;
-}
-
-function computeCountsFromBlocks(blocks) {
-  const m = blocksByCategory(blocks);
-  const len = (cat) => (m.get(cat)?.items?.length ?? 0);
-  return {
-    urgent_attention: len("urgent_attention"),
-    action_required: len("action_required"),
-    documents_to_review: len("documents_to_review"),
-    informational: len("informational"),
-  };
-}
-
-function sumCounts(counts) {
-  return Object.values(counts).reduce((a, b) => a + b, 0);
-}
 
 function panelMeta(category) {
   switch (category) {
@@ -66,16 +52,24 @@ ${String(err?.message || err)}
     return;
   }
 
+  // View-only blocks (sorted). Do not mutate source model.
+  const viewBlocks = getSortedBlocks(model.blocks || []);
+
   const state = {
     isModalOpen: false,
     modalItem: null,
     modalCategory: null,
   };
 
+  function closeModal() {
+    state.isModalOpen = false;
+    state.modalItem = null;
+    state.modalCategory = null;
+    render();
+  }
+
   function render() {
-    const blocks = model.blocks || [];
-    const byCat = blocksByCategory(blocks);
-    const counts = computeCountsFromBlocks(blocks);
+    const counts = computeCountsFromBlocks(viewBlocks);
     const total = sumCounts(counts);
 
     const headerHtml = `
@@ -92,8 +86,10 @@ ${String(err?.message || err)}
     const panelsHtml = order
       .map((cat) => {
         const meta = panelMeta(cat);
-        const items = byCat.get(cat)?.items || [];
+        const block = viewBlocks.find((b) => b.category === cat);
+        const items = block?.items || [];
         const itemsHtml = items.map((it) => EmailCard({ item: it, category: cat })).join("");
+
         return Panel({
           title: meta.title,
           subtitle: meta.subtitle,
@@ -126,8 +122,9 @@ ${String(err?.message || err)}
 
         const emailId = card.getAttribute("data-email-id");
         const category = card.getAttribute("data-category");
-        const items = model.blocks?.find((b) => b.category === category)?.items || [];
-        const found = items.find((x) => x.email_id === emailId);
+        if (!emailId || !category) return;
+
+        const found = findItem(viewBlocks, category, emailId);
         if (!found) return;
 
         state.isModalOpen = true;
@@ -140,32 +137,19 @@ ${String(err?.message || err)}
     const backdrop = qs("#modalBackdrop", root);
     const closeBtn = qs("#modalClose", root);
 
-    if (closeBtn) {
-      on(closeBtn, "click", () => {
-        state.isModalOpen = false;
-        state.modalItem = null;
-        state.modalCategory = null;
-        render();
-      });
-    }
+    if (closeBtn) on(closeBtn, "click", closeModal);
 
     if (backdrop) {
       on(backdrop, "click", (e) => {
         if (e.target !== backdrop) return;
-        state.isModalOpen = false;
-        state.modalItem = null;
-        state.modalCategory = null;
-        render();
+        closeModal();
       });
     }
 
     on(window, "keydown", (e) => {
       if (e.key !== "Escape") return;
       if (!state.isModalOpen) return;
-      state.isModalOpen = false;
-      state.modalItem = null;
-      state.modalCategory = null;
-      render();
+      closeModal();
     });
   }
 

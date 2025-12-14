@@ -244,6 +244,16 @@ body {
 
 .modal-text { font-size: 12px; line-height: 1.45; color: rgba(11, 18, 32, 0.82); }
 
+.empty-state {
+  padding: 14px;
+  border: 1px dashed rgba(11, 18, 32, 0.18);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.6);
+}
+
 @media (max-width: 900px) {
   .panel { grid-column: span 12; }
   .modal-body { grid-template-columns: 1fr; }

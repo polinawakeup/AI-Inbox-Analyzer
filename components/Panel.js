@@ -1,4 +1,6 @@
 export function Panel({ title, subtitle, accentClass, itemsHtml, count }) {
+  const hasItems = Boolean(itemsHtml && itemsHtml.trim().length > 0);
+
   return `
     <section class="panel ${accentClass}">
       <div class="panel-head">
@@ -9,7 +11,7 @@ export function Panel({ title, subtitle, accentClass, itemsHtml, count }) {
         <div class="panel-count">${count ?? 0}</div>
       </div>
       <div class="panel-body">
-        ${itemsHtml || ""}
+        ${hasItems ? itemsHtml : `<div class="empty-state">No items</div>`}
       </div>
     </section>
   `;
