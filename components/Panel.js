@@ -1,0 +1,16 @@
+export function Panel({ title, subtitle, accentClass, itemsHtml, count }) {
+  return `
+    <section class="panel ${accentClass}">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title"><span class="dot"></span>${title}</div>
+          <div class="panel-subtitle">${subtitle ?? ""}</div>
+        </div>
+        <div class="panel-count">${count ?? 0}</div>
+      </div>
+      <div class="panel-body">
+        ${itemsHtml || ""}
+      </div>
+    </section>
+  `;
+}

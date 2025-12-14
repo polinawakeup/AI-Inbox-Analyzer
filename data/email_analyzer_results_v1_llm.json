@@ -1,0 +1,142 @@
+[
+  {
+    "email_id": "e-0001",
+    "category": "urgent_attention",
+    "reason": "Carrier requires confirmation today to lock in tomorrow's shipment slot, delaying risks losing the time slot.",
+    "suggested_action": "Respond today confirming the 10:00-12:00 slot to secure the shipment time.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0002",
+    "category": "urgent_attention",
+    "reason": "Invoice due tomorrow with explicit warning that payment is required to avoid service interruption.",
+    "suggested_action": "Process payment immediately to prevent service disruption.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0009",
+    "category": "documents_to_review",
+    "reason": "Draft contract attachment requires review and comments without immediate deadline.",
+    "suggested_action": "Review the attached contract and provide feedback when ready.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0011",
+    "category": "informational",
+    "reason": "Newsletter with product updates and tips, no action required.",
+    "suggested_action": "Review updates for awareness, no response needed.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0005",
+    "category": "action_required",
+    "reason": "Requires decision between two layout options and feedback on copy tone without urgent deadline.",
+    "suggested_action": "Choose preferred layout option and provide copy tone guidance when convenient.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0003",
+    "category": "urgent_attention",
+    "reason": "Security alert requiring confirmation within 24 hours to verify account access or secure compromised account.",
+    "suggested_action": "Confirm the sign-in attempt within 24 hours or secure your account immediately if unauthorized.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0004",
+    "category": "documents_to_review",
+    "reason": "Offer details PDF attachment requires review and confirmation by Monday for onboarding process.",
+    "suggested_action": "Review the attached offer details and confirm acceptance by Monday.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0006",
+    "category": "urgent_attention",
+    "reason": "Itinerary review required today to avoid fees for corrections after deadline.",
+    "suggested_action": "Check passenger name spelling in the attached itinerary today to avoid additional charges.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0007",
+    "category": "action_required",
+    "reason": "Feedback requested by end of week without immediate urgency or financial consequences.",
+    "suggested_action": "Review the draft and provide feedback by end of week.",
+    "confidence": 0.85
+  },
+  {
+    "email_id": "e-0008",
+    "category": "urgent_attention",
+    "reason": "Payment failure requiring immediate card update to prevent subscription service interruption.",
+    "suggested_action": "Update card details immediately to maintain subscription access.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0010",
+    "category": "informational",
+    "reason": "Receipt attachment for completed payment, no action required.",
+    "suggested_action": "File the receipt for records, no response needed.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0012",
+    "category": "action_required",
+    "reason": "Request to send photos with explicit no rush indication, requires action but not urgent.",
+    "suggested_action": "Send the photos from last weekend when convenient.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0013",
+    "category": "informational",
+    "reason": "Delivery status notification with tracking number, no action required.",
+    "suggested_action": "Track package arrival, no response needed.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0014",
+    "category": "action_required",
+    "reason": "Request to verify numbers in meeting notes attachment without immediate deadline.",
+    "suggested_action": "Review section 2 numbers in the attached meeting notes and confirm accuracy.",
+    "confidence": 0.85
+  },
+  {
+    "email_id": "e-0015",
+    "category": "action_required",
+    "reason": "Support ticket requires address confirmation to close, no urgent deadline indicated.",
+    "suggested_action": "Reply confirming your installation address to close the support ticket.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0016",
+    "category": "action_required",
+    "reason": "Password expires in 2 days requiring update, but not immediate urgency as there is a 2-day buffer.",
+    "suggested_action": "Update password within the next 2 days to maintain account access.",
+    "confidence": 0.85
+  },
+  {
+    "email_id": "e-0017",
+    "category": "informational",
+    "reason": "Ticket confirmation with PDF attachment, registration complete, no action required.",
+    "suggested_action": "Save the ticket for event attendance, no response needed.",
+    "confidence": 0.95
+  },
+  {
+    "email_id": "e-0018",
+    "category": "action_required",
+    "reason": "Question requiring clarification about pricing, quick yes/no answer requested without urgency.",
+    "suggested_action": "Reply clarifying whether implementation support is included in the price.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0019",
+    "category": "documents_to_review",
+    "reason": "Tax form attachment requiring signature and return for payroll processing this month.",
+    "suggested_action": "Sign the attached tax form and return it to enable payroll processing.",
+    "confidence": 0.9
+  },
+  {
+    "email_id": "e-0020",
+    "category": "informational",
+    "reason": "Scheduled maintenance notification with explicit no action needed unless issues occur.",
+    "suggested_action": "Note the maintenance window, no action required unless problems arise tomorrow.",
+    "confidence": 0.95
+  }
+]

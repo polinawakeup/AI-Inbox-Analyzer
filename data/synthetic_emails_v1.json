@@ -1,0 +1,303 @@
+{
+  "dataset_name": "AI Inbox Analyzer - Synthetic Emails v1",
+  "generated_at": "2025-12-13T20:15:00Z",
+  "timezone": "Europe/Amsterdam",
+  "emails": [
+    {
+      "id": "e-0001",
+      "thread_id": "t-1001",
+      "received_at": "2025-12-13T08:12:31Z",
+      "from": { "name": "Anna Müller", "email": "anna.mueller@partner-co.com" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Quick confirmation needed for the shipment slot",
+      "snippet": "Can you confirm we can keep the 10:00–12:00 slot tomorrow? The carrier needs it today.",
+      "body_text": "Hi Polina,\n\nCan you confirm we can keep the 10:00–12:00 slot tomorrow? The carrier needs a confirmation today to lock it in.\n\nThanks,\nAnna",
+      "labels": ["INBOX", "IMPORTANT"],
+      "attachments": [],
+      "ground_truth_category": "urgent_attention"
+    },
+    {
+      "id": "e-0002",
+      "thread_id": "t-1002",
+      "received_at": "2025-12-13T09:03:10Z",
+      "from": { "name": "Billing", "email": "billing@cloudservice.com" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Invoice #CS-18420 due on 14 Dec",
+      "snippet": "Your invoice is due tomorrow. Payment is required to avoid service interruption.",
+      "body_text": "Hello,\n\nInvoice #CS-18420 is due on 14 Dec 2025.\nAmount: €119.00\n\nPayment is required to avoid service interruption.\n\nRegards,\nCloudService Billing",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "CS-18420.pdf", "mime_type": "application/pdf", "size_bytes": 182044 }
+      ],
+      "ground_truth_category": "urgent_attention"
+    },
+    {
+      "id": "e-0003",
+      "thread_id": "t-1003",
+      "received_at": "2025-12-13T10:44:55Z",
+      "from": { "name": "Bank Alerts", "email": "alerts@mybank.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Action required: new device sign-in",
+      "snippet": "We noticed a sign-in attempt from a new device. Confirm within 24 hours.",
+      "body_text": "Dear customer,\n\nWe noticed a sign-in attempt from a new device.\nIf this was you, please confirm within 24 hours.\nIf not, secure your account immediately.\n\n— MyBank Security",
+      "labels": ["INBOX", "IMPORTANT"],
+      "attachments": [],
+      "ground_truth_category": "urgent_attention"
+    },
+    {
+      "id": "e-0004",
+      "thread_id": "t-1004",
+      "received_at": "2025-12-13T11:20:02Z",
+      "from": { "name": "Marta (HR)", "email": "marta.hr@company.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Offer details — please confirm by Monday",
+      "snippet": "Please confirm acceptance by Monday so we can proceed with onboarding paperwork.",
+      "body_text": "Hi Polina,\n\nSharing the offer details attached. Please confirm acceptance by Monday so we can proceed with onboarding paperwork.\n\nBest,\nMarta",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Offer_Details.pdf", "mime_type": "application/pdf", "size_bytes": 341201 }
+      ],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0005",
+      "thread_id": "t-1005",
+      "received_at": "2025-12-13T12:05:18Z",
+      "from": { "name": "Dmitry", "email": "dmitry@freelance.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Do you prefer option A or B for the landing page layout?",
+      "snippet": "I can implement either layout — need your pick and any notes on copy.",
+      "body_text": "Hey,\n\nI can implement either layout — option A (hero + pricing) or option B (case studies first). Which do you prefer? Any notes on the copy tone?\n\nThanks,\nDmitry",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0006",
+      "thread_id": "t-1006",
+      "received_at": "2025-12-13T12:32:44Z",
+      "from": { "name": "Travel Support", "email": "support@airline.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Your itinerary — please review passenger details",
+      "snippet": "Please check the spelling of passenger names. Corrections after today may incur fees.",
+      "body_text": "Hello,\n\nYour itinerary is attached. Please check the spelling of passenger names.\nCorrections after today may incur fees.\n\nRegards,\nAirline Support",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Itinerary.pdf", "mime_type": "application/pdf", "size_bytes": 250119 }
+      ],
+      "ground_truth_category": "urgent_attention"
+    },
+    {
+      "id": "e-0007",
+      "thread_id": "t-1007",
+      "received_at": "2025-12-13T13:10:07Z",
+      "from": { "name": "Project Lead", "email": "lead@studio.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [{ "name": "Team", "email": "team@studio.example" }],
+      "subject": "Can you share your feedback on the draft by end of week?",
+      "snippet": "We're collecting feedback on the draft. Your notes would help us finalize.",
+      "body_text": "Hi,\n\nWe're collecting feedback on the draft. Your notes would help us finalize.\nCan you share your feedback by end of week?\n\nThanks!",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0008",
+      "thread_id": "t-1008",
+      "received_at": "2025-12-13T14:02:51Z",
+      "from": { "name": "Payments", "email": "no-reply@subscription.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Payment failed — update your card to keep access",
+      "snippet": "Your latest payment failed. Update your card details to avoid losing access.",
+      "body_text": "Hi,\n\nYour latest payment failed.\nUpdate your card details to keep your subscription active.\n\n— Subscription Team",
+      "labels": ["INBOX", "IMPORTANT"],
+      "attachments": [],
+      "ground_truth_category": "urgent_attention"
+    },
+    {
+      "id": "e-0009",
+      "thread_id": "t-1009",
+      "received_at": "2025-12-13T14:35:19Z",
+      "from": { "name": "Legal", "email": "legal@client.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Draft contract attached — please review",
+      "snippet": "Attached is the draft contract. Please review and send comments when ready.",
+      "body_text": "Hello,\n\nAttached is the draft contract. Please review and send comments when ready.\n\nBest,\nLegal Team",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Draft_Contract.docx", "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "size_bytes": 98044 }
+      ],
+      "ground_truth_category": "documents_to_review"
+    },
+    {
+      "id": "e-0010",
+      "thread_id": "t-1010",
+      "received_at": "2025-12-13T15:06:05Z",
+      "from": { "name": "Accounting", "email": "accounting@vendor.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Receipt for your payment",
+      "snippet": "Thanks — here is the receipt for your recent payment.",
+      "body_text": "Hi,\n\nThanks — here is the receipt for your recent payment.\n\nRegards,\nAccounting",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Receipt_2025-12-13.pdf", "mime_type": "application/pdf", "size_bytes": 120881 }
+      ],
+      "ground_truth_category": "informational"
+    },
+    {
+      "id": "e-0011",
+      "thread_id": "t-1011",
+      "received_at": "2025-12-13T15:40:49Z",
+      "from": { "name": "Newsletter", "email": "news@productupdates.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "This week's updates: new features and tips",
+      "snippet": "Here are the latest product updates and tips to get more value.",
+      "body_text": "Hi there,\n\nHere are this week's updates:\n- New dashboard widgets\n- Faster exports\n- Tips & tricks\n\nSee you next week!",
+      "labels": ["INBOX", "CATEGORY_UPDATES"],
+      "attachments": [],
+      "ground_truth_category": "informational"
+    },
+    {
+      "id": "e-0012",
+      "thread_id": "t-1012",
+      "received_at": "2025-12-13T16:05:12Z",
+      "from": { "name": "Nina", "email": "nina@family.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Can you send me the photos when you have a minute?",
+      "snippet": "No rush — but I'd love the photos from last weekend.",
+      "body_text": "Hey!\n\nNo rush — but I'd love the photos from last weekend when you have a minute.\n\n❤️",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0013",
+      "thread_id": "t-1013",
+      "received_at": "2025-12-13T16:22:27Z",
+      "from": { "name": "Delivery", "email": "updates@delivery.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Your package is out for delivery",
+      "snippet": "Your package is out for delivery and should arrive today.",
+      "body_text": "Hello,\n\nYour package is out for delivery and should arrive today.\nTracking: TRK-49210\n\n— Delivery Updates",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "informational"
+    },
+    {
+      "id": "e-0014",
+      "thread_id": "t-1014",
+      "received_at": "2025-12-13T17:01:33Z",
+      "from": { "name": "Olga", "email": "olga@colleague.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Re: Meeting notes",
+      "snippet": "Can you double-check the numbers in section 2? I'm not sure they're correct.",
+      "body_text": "Hi Polina,\n\nCan you double-check the numbers in section 2? I'm not sure they're correct.\n\nThanks,\nOlga",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Meeting_Notes.pdf", "mime_type": "application/pdf", "size_bytes": 210884 }
+      ],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0015",
+      "thread_id": "t-1015",
+      "received_at": "2025-12-13T17:20:10Z",
+      "from": { "name": "Support", "email": "support@internet.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "We need additional info to close your ticket",
+      "snippet": "Please reply with your address confirmation so we can close the ticket.",
+      "body_text": "Hello,\n\nTo close your ticket, please reply confirming your installation address.\n\nThanks,\nSupport",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0016",
+      "thread_id": "t-1016",
+      "received_at": "2025-12-13T18:02:59Z",
+      "from": { "name": "Security Team", "email": "security@workspace.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Password expires soon",
+      "snippet": "Your password will expire in 2 days. Update it to avoid losing access.",
+      "body_text": "Hi,\n\nYour password will expire in 2 days.\nPlease update it to avoid losing access.\n\n— Security Team",
+      "labels": ["INBOX", "IMPORTANT"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0017",
+      "thread_id": "t-1017",
+      "received_at": "2025-12-13T18:40:21Z",
+      "from": { "name": "Conference", "email": "registration@event.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Your ticket confirmation",
+      "snippet": "Thanks for registering — your ticket is confirmed.",
+      "body_text": "Hi,\n\nThanks for registering. Your ticket is confirmed.\n\n— Event Team",
+      "labels": ["INBOX"],
+      "attachments": [
+        { "filename": "Ticket.pdf", "mime_type": "application/pdf", "size_bytes": 104992 }
+      ],
+      "ground_truth_category": "informational"
+    },
+    {
+      "id": "e-0018",
+      "thread_id": "t-1018",
+      "received_at": "2025-12-13T19:05:44Z",
+      "from": { "name": "Mark", "email": "mark@client.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Re: Proposal — small clarification",
+      "snippet": "Could you clarify whether the price includes implementation support?",
+      "body_text": "Hi Polina,\n\nCould you clarify whether the price includes implementation support? A quick yes/no is enough.\n\nThanks,\nMark",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "action_required"
+    },
+    {
+      "id": "e-0019",
+      "thread_id": "t-1019",
+      "received_at": "2025-12-13T19:22:17Z",
+      "from": { "name": "Payroll", "email": "payroll@company.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Tax form: please sign and return",
+      "snippet": "Please sign the attached form and return it. We need it to process this month's payroll.",
+      "body_text": "Hi,\n\nPlease sign the attached tax form and return it.\nWe need it to process this month's payroll.\n\nThanks,\nPayroll",
+      "labels": ["INBOX", "IMPORTANT"],
+      "attachments": [
+        { "filename": "Tax_Form.pdf", "mime_type": "application/pdf", "size_bytes": 288771 }
+      ],
+      "ground_truth_category": "documents_to_review"
+    },
+    {
+      "id": "e-0020",
+      "thread_id": "t-1020",
+      "received_at": "2025-12-13T20:01:38Z",
+      "from": { "name": "Service Desk", "email": "servicedesk@company.example" },
+      "to": [{ "name": "Polina", "email": "polina@example.com" }],
+      "cc": [],
+      "subject": "Scheduled maintenance tonight",
+      "snippet": "There will be maintenance tonight. No action needed unless you experience issues tomorrow.",
+      "body_text": "Hello,\n\nThere will be scheduled maintenance tonight (23:00–01:00).\nNo action is required unless you experience issues tomorrow.\n\n— Service Desk",
+      "labels": ["INBOX"],
+      "attachments": [],
+      "ground_truth_category": "informational"
+    }
+  ]
+}
