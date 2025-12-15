@@ -19,6 +19,7 @@ import { KPIBar } from "./KPIBar.js";
 import { Panel } from "./Panel.js";
 import { EmailCard } from "./EmailCard.js";
 import { Modal } from "./Modal.js";
+import { TriageStrip } from "./TriageStrip.js";
 import { formatWhen } from "../utils/formatWhen.js";
 
 const DATA_URL = "./data/dashboard_view_model_v1.json";
@@ -183,6 +184,15 @@ export async function mountApp({ rootId }) {
     const now = new Date();
     const current = cleanupExpiredSnoozes(state.triage || loadTriageState(), now);
 
+    if (kind === "restore") {
+      const next = removeFromTriage(current, emailId);
+      state.triage = saveTriageState(next);
+      showToast("success", "Restored to inbox.");
+      state.snoozeMenu = null;
+      render();
+      return;
+    }
+
     if (kind === "done") {
       const next = { ...current, done: Array.from(new Set([...current.done, emailId])) };
       state.triage = saveTriageState(next);
@@ -322,54 +332,63 @@ export async function mountApp({ rootId }) {
     const doneMeta = triagePanelMeta("done");
 
     const snoozedHtml = snoozedItems
-      .map((it) => EmailCard({
-        item: { ...it, _show_new: false },
-        category: it._source_category || "informational",
-        extraMeta: it._snooze_until ? `Until ${formatWhen(it._snooze_until)}` : "",
-      }))
+      .map((it) =>
+        EmailCard({
+          item: { ...it, _show_new: false },
+          category: it._source_category || "informational",
+          extraMeta: it._snooze_until ? `Until ${formatWhen(it._snooze_until)}` : "",
+          triageMode: true,
+        })
+      )
       .join("");
 
     const ignoredHtml = ignoredItems
-      .map((it) => EmailCard({ item: { ...it, _show_new: false }, category: it._source_category || "informational" }))
+      .map((it) =>
+        EmailCard({
+          item: { ...it, _show_new: false },
+          category: it._source_category || "informational",
+          triageMode: true,
+        })
+      )
       .join("");
 
     const doneHtml = doneItems
-      .map((it) => EmailCard({ item: { ...it, _show_new: false }, category: it._source_category || "informational" }))
+      .map((it) =>
+        EmailCard({
+          item: { ...it, _show_new: false },
+          category: it._source_category || "informational",
+          triageMode: true,
+        })
+      )
       .join("");
 
-    const triagePanelsHtml = `
-      <div class="triage-panels">
-        ${Panel({
+    const triageStripsHtml = `
+      <div class="triage-strips">
+        ${TriageStrip({
+          id: "snoozed",
           title: snoozedMeta.title,
           subtitle: snoozedMeta.subtitle,
-          accentClass: snoozedMeta.accentClass,
-          itemsHtml: snoozedHtml,
           count: snoozedItems.length,
-          collapsible: true,
-          isCollapsed: state.collapsed.snoozed,
-          onToggleId: "snoozed",
+          collapsed: state.collapsed.snoozed,
+          itemsHtml: snoozedHtml,
         })}
 
-        ${Panel({
+        ${TriageStrip({
+          id: "ignored",
           title: ignoredMeta.title,
           subtitle: ignoredMeta.subtitle,
-          accentClass: ignoredMeta.accentClass,
-          itemsHtml: ignoredHtml,
           count: ignoredItems.length,
-          collapsible: true,
-          isCollapsed: state.collapsed.ignored,
-          onToggleId: "ignored",
+          collapsed: state.collapsed.ignored,
+          itemsHtml: ignoredHtml,
         })}
 
-        ${Panel({
+        ${TriageStrip({
+          id: "done",
           title: doneMeta.title,
           subtitle: doneMeta.subtitle,
-          accentClass: doneMeta.accentClass,
-          itemsHtml: doneHtml,
           count: doneItems.length,
-          collapsible: true,
-          isCollapsed: state.collapsed.done,
-          onToggleId: "done",
+          collapsed: state.collapsed.done,
+          itemsHtml: doneHtml,
         })}
       </div>
     `;
@@ -379,7 +398,7 @@ export async function mountApp({ rootId }) {
         ${headerHtml}
         <main class="board" id="board">
           ${panelsHtml}
-          ${triagePanelsHtml}
+          ${triageStripsHtml}
         </main>
         <div class="overlay-layer" id="overlayLayer">
           ${renderSnoozeMenuHtml()}
@@ -409,7 +428,30 @@ export async function mountApp({ rootId }) {
     const board = qs("#board", root);
     if (board) {
       on(board, "click", (e) => {
-        // Toggle collapsible panels
+        // Toggle triage strips (click anywhere on the triage header)
+        const triageToggle = e.target.closest("[data-triage-toggle]");
+        if (triageToggle && triageToggle.classList.contains("triage-head")) {
+          const id = triageToggle.getAttribute("data-triage-toggle");
+          if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+            state.collapsed[id] = !state.collapsed[id];
+            render();
+          }
+          return;
+        }
+      on(board, "keydown", (e) => {
+        const el = e.target;
+        if (!(el instanceof HTMLElement)) return;
+        if (!el.matches(".triage-head[data-triage-toggle]")) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+
+        const id = el.getAttribute("data-triage-toggle");
+        if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+          state.collapsed[id] = !state.collapsed[id];
+          render();
+        }
+      });
+
         const toggle = e.target.closest("[data-toggle]");
         if (toggle) {
           const id = toggle.getAttribute("data-toggle");
