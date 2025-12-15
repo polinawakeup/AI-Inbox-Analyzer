@@ -85,6 +85,8 @@ export async function mountApp({ rootId }) {
   let sortedBlocks = [];
   let latestMs = 0;
 
+  let eventsWired = false;
+
   async function loadData() {
     const model = await loadDashboardModel(DATA_URL);
     sortedBlocks = getSortedBlocks(model.blocks || []);
@@ -281,7 +283,7 @@ export async function mountApp({ rootId }) {
     <div class="header-top">
       <div class="profile">
         <img class="avatar" src="./assets/avatar.png" alt="User avatar" />
-        <div>
+        <div class="brand-container">
           <div class="brand-title">AI Inbox Analyzer</div>
           <div class="brand-subtitle">Polina • inbox dashboard</div>
         </div>
@@ -411,124 +413,142 @@ export async function mountApp({ rootId }) {
   }
 
   function wireEvents() {
-    const appEl = qs(".app", root);
+    if (eventsWired) return;
+    eventsWired = true;
 
-    // Global click handling (close snooze menu on outside click)
-    if (appEl) {
-      on(appEl, "click", (e) => {
-        const inMenu = e.target.closest(".snooze-menu");
-        const snoozeBtn = e.target.closest('[data-triage="snooze"]');
-        if (state.snoozeMenu && !inMenu && !snoozeBtn) {
-          state.snoozeMenu = null;
-          render();
-        }
-      });
-    }
-
-    const board = qs("#board", root);
-    if (board) {
-      on(board, "click", (e) => {
-        // Toggle triage strips (click anywhere on the triage header)
-        const triageToggle = e.target.closest("[data-triage-toggle]");
-        if (triageToggle && triageToggle.classList.contains("triage-head")) {
-          const id = triageToggle.getAttribute("data-triage-toggle");
-          if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
-            state.collapsed[id] = !state.collapsed[id];
-            render();
-          }
-          return;
-        }
-      on(board, "keydown", (e) => {
-        const el = e.target;
-        if (!(el instanceof HTMLElement)) return;
-        if (!el.matches(".triage-head[data-triage-toggle]")) return;
-        if (e.key !== "Enter" && e.key !== " ") return;
+    // Delegate ALL clicks from the stable root node (root is not replaced on render)
+    on(root, "click", (e) => {
+      // 1) Snooze menu selection (menu lives outside #board, so handle it at root)
+      const snoozePick = e.target.closest("[data-snooze-preset]");
+      if (snoozePick) {
         e.preventDefault();
+        e.stopPropagation();
+        const preset = snoozePick.getAttribute("data-snooze-preset");
+        const emailId = snoozePick.getAttribute("data-email-id");
+        if (preset && emailId) setSnoozePreset(emailId, preset);
+        return;
+      }
 
-        const id = el.getAttribute("data-triage-toggle");
+      // 2) Refresh button (re-rendered each time, so delegate)
+      const refreshBtn = e.target.closest("#refreshBtn");
+      if (refreshBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRefreshClick();
+        return;
+      }
+
+      // 3) Modal close button (delegated)
+      const modalClose = e.target.closest("#modalClose");
+      if (modalClose) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal();
+        return;
+      }
+
+      // 4) Backdrop click closes modal (delegated; only if click target IS the backdrop)
+      const backdrop = qs("#modalBackdrop", root);
+      if (backdrop && e.target === backdrop) {
+        closeModal();
+        return;
+      }
+
+      // 5) Triage strip expand/collapse: click anywhere on triage header
+      const triageToggle = e.target.closest(".triage-head[data-triage-toggle]");
+      if (triageToggle) {
+        // Do NOT toggle if the click happened inside an email card (e.g., card buttons)
+        if (e.target.closest(".email-card")) return;
+
+        e.preventDefault();
+        const id = triageToggle.getAttribute("data-triage-toggle");
         if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
           state.collapsed[id] = !state.collapsed[id];
           render();
         }
-      });
+        return;
+      }
 
-        const toggle = e.target.closest("[data-toggle]");
-        if (toggle) {
-          const id = toggle.getAttribute("data-toggle");
-          if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
-            state.collapsed[id] = !state.collapsed[id];
-            render();
-          }
+      // 6) (Legacy) panel toggle support if still present
+      const toggle = e.target.closest("[data-toggle]");
+      if (toggle) {
+        const id = toggle.getAttribute("data-toggle");
+        if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+          state.collapsed[id] = !state.collapsed[id];
+          render();
+        }
+        return;
+      }
+
+      // 7) Quick triage buttons (Done / Snooze / Ignore / Restore)
+      const triageBtn = e.target.closest("[data-triage]");
+      if (triageBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const kind = triageBtn.getAttribute("data-triage");
+        const emailId = triageBtn.getAttribute("data-email-id");
+        if (!kind || !emailId) return;
+
+        // Category is on the closest card
+        const cardEl = triageBtn.closest(".email-card");
+        const category = cardEl?.getAttribute("data-category") || "informational";
+
+        applyTriageAction(kind, emailId, category, triageBtn);
+        return;
+      }
+
+      // 8) Close snooze menu on outside click (but not when clicking snooze button)
+      if (state.snoozeMenu) {
+        const inMenu = e.target.closest(".snooze-menu");
+        const snoozeBtn = e.target.closest('[data-triage="snooze"]');
+        if (!inMenu && !snoozeBtn) {
+          state.snoozeMenu = null;
+          render();
           return;
         }
+      }
 
-        // Snooze menu selection
-        const snoozePick = e.target.closest("[data-snooze-preset]");
-        if (snoozePick) {
-          const preset = snoozePick.getAttribute("data-snooze-preset");
-          const emailId = snoozePick.getAttribute("data-email-id");
-          if (preset && emailId) setSnoozePreset(emailId, preset);
-          return;
-        }
+      // 9) Open modal on card click
+      const card = e.target.closest(".email-card");
+      if (!card) return;
 
-        // Quick triage buttons
-        const triageBtn = e.target.closest("[data-triage]");
-        if (triageBtn) {
-          e.preventDefault();
-          e.stopPropagation();
-          const kind = triageBtn.getAttribute("data-triage");
-          const emailId = triageBtn.getAttribute("data-email-id");
-          if (!kind || !emailId) return;
+      const emailId = card.getAttribute("data-email-id");
+      const category = card.getAttribute("data-category");
+      if (!emailId || !category) return;
 
-          // Category is on the closest card
-          const cardEl = triageBtn.closest(".email-card");
-          const category = cardEl?.getAttribute("data-category") || "informational";
+      let found = findItem(sortedBlocks, category, emailId);
+      let foundCat = category;
 
-          applyTriageAction(kind, emailId, category, triageBtn);
-          return;
-        }
+      if (!found) {
+        const any = findAny(sortedBlocks, emailId);
+        if (!any) return;
+        found = any.item;
+        foundCat = any.category;
+      }
 
-        // Open modal on card click
-        const card = e.target.closest(".email-card");
-        if (!card) return;
+      state.viewedIds.add(emailId);
+      state.isModalOpen = true;
+      state.modalItem = found;
+      state.modalCategory = foundCat;
+      render();
+    });
 
-        const emailId = card.getAttribute("data-email-id");
-        const category = card.getAttribute("data-category");
-        if (!emailId || !category) return;
+    // Keyboard support for triage header toggle (Enter/Space)
+    on(root, "keydown", (e) => {
+      const el = e.target;
+      if (!(el instanceof HTMLElement)) return;
+      if (!el.matches(".triage-head[data-triage-toggle]")) return;
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
 
-        let found = findItem(sortedBlocks, category, emailId);
-        let foundCat = category;
-
-        if (!found) {
-          const any = findAny(sortedBlocks, emailId);
-          if (!any) return;
-          found = any.item;
-          foundCat = any.category;
-        }
-
-        state.viewedIds.add(emailId);
-        state.isModalOpen = true;
-        state.modalItem = found;
-        state.modalCategory = foundCat;
+      const id = el.getAttribute("data-triage-toggle");
+      if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+        state.collapsed[id] = !state.collapsed[id];
         render();
-      });
-    }
+      }
+    });
 
-    const refreshBtn = qs("#refreshBtn", root);
-    if (refreshBtn) on(refreshBtn, "click", handleRefreshClick);
-
-    const backdrop = qs("#modalBackdrop", root);
-    const closeBtn = qs("#modalClose", root);
-
-    if (closeBtn) on(closeBtn, "click", closeModal);
-
-    if (backdrop) {
-      on(backdrop, "click", (e) => {
-        if (e.target !== backdrop) return;
-        closeModal();
-      });
-    }
-
+    // Escape handling (register once)
     on(window, "keydown", (e) => {
       if (e.key !== "Escape") return;
       if (state.snoozeMenu) {
