@@ -4,6 +4,7 @@ export function Panel({
   accentClass,
   itemsHtml,
   count,
+  category = "",
   collapsible = false,
   isCollapsed = false,
   onToggleId = ""
@@ -18,7 +19,7 @@ export function Panel({
     : "";
 
   return `
-    <section class="panel ${accentClass}">
+    <section class="panel ${accentClass}" data-panel-category="${category}">
       <div class="panel-head">
         <div>
           <div class="panel-title"><span class="dot"></span>${title}</div>
