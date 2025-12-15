@@ -22,8 +22,8 @@ export function EmailCard({ item, category }) {
       <div class="email-top">
         <div class="email-subject">${subject}</div>
         <div class="email-tags">
+          ${attCount > 0 ? `<span class="pill">📎 ${attCount}</span>` : ""}
           ${showNew ? `<span class="badge-new">New</span>` : ""}
-          <span class="pill">${attCount > 0 ? `📎 ${attCount}` : "—"}</span>
         </div>
       </div>
 

@@ -134,28 +134,31 @@ ${String(err?.message || err)}
       : "";
 
     const headerHtml = `
-      <header class="header">
-        <div class="header-left">
-          <div class="profile">
-            <img class="avatar" src="./assets/avatar.png" alt="User avatar" />
-            <div>
-              <div class="brand-title">AI Inbox Analyzer</div>
-              <div class="brand-subtitle">Polina • inbox dashboard</div>
-            </div>
-          </div>
+  <header class="header">
+    <div class="header-top">
+      <div class="profile">
+        <img class="avatar" src="./assets/avatar.png" alt="User avatar" />
+        <div>
+          <div class="brand-title">AI Inbox Analyzer</div>
+          <div class="brand-subtitle">Polina • inbox dashboard</div>
         </div>
+      </div>
 
-        <div class="header-right">
-          <button class="icon-btn" id="refreshBtn" title="Refresh dashboard" ${state.isRefreshing ? "disabled" : ""}>
-            <span class="refresh-icon ${state.isRefreshing ? "spin" : ""}">⟳</span>
-          </button>
-          ${KPIBar({ counts, total })}
-          <div class="last-updated">${lastUpdatedLabel}</div>
-        </div>
-      </header>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" title="Refresh dashboard" ${state.isRefreshing ? "disabled" : ""}>
+          <span class="refresh-icon ${state.isRefreshing ? "spin" : ""}">⟳</span>
+        </button>
+        <div class="last-updated">${lastUpdatedLabel}</div>
+      </div>
+    </div>
 
-      <div class="toast-host">${toastHtml}</div>
-    `;
+    <div class="header-kpis">
+      ${KPIBar({ counts, total })}
+    </div>
+  </header>
+
+  <div class="toast-host">${toastHtml}</div>
+`;
 
     const order = ["urgent_attention", "action_required", "documents_to_review", "informational"];
     const panelsHtml = order
