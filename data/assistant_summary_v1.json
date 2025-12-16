@@ -5,5 +5,13 @@
     "Good morning, Polina. Two things need attention today: a shipment slot confirmation from Anna Müller and an invoice that’s due tomorrow to avoid service disruption.",
     "There are a few quick wins: Mark is waiting for a pricing clarification, and Support can close your ticket once you confirm the address.",
     "You also have documents in the inbox — a tax form and offer details — worth skimming when you have a calm window."
+  ],
+  "mentions": [
+    { "phrase": "Anna Müller", "email_id": "e-0001" },
+    { "phrase": "an invoice that’s due tomorrow", "email_id": "e-0002" },
+    { "phrase": "Mark", "email_id": "e-0018" },
+    { "phrase": "Support", "email_id": "e-0015" },
+    { "phrase": "tax form", "email_id": "e-0019" },
+    { "phrase": "offer details", "email_id": "e-0004" }
   ]
 }

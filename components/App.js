@@ -405,6 +405,30 @@ export async function mountApp({ rootId }) {
           return;
         }
 
+        // Summary mentions -> open the referenced email modal
+        const mentionBtn = e.target.closest("[data-mention-email-id]");
+        if (mentionBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const emailId = mentionBtn.getAttribute("data-mention-email-id");
+          if (!emailId) return;
+
+          // Prefer finding across all blocks (works even if the email is currently triaged)
+          const any = findAny(sortedBlocks, emailId);
+          if (!any) {
+            showToast("error", "Email not found.");
+            return;
+          }
+
+          state.viewedIds.add(emailId);
+          state.isModalOpen = true;
+          state.modalItem = any.item;
+          state.modalCategory = any.category;
+          render();
+          return;
+        }
+
         // Snooze menu selection
         const snoozePick = e.target.closest("[data-snooze-preset]");
         if (snoozePick) {

@@ -640,7 +640,45 @@ body {
   color: var(--muted);
 }
 
-.assistant-listen-icon{
-  font-size: 16px;
-  line-height: 1;
+/* Mentions: clickable links to open email modal (Iteration 5A) */
+.assistant-summary [data-mention-email-id]{
+  /* Make mentions look like inline links (not buttons/chips) */
+  display: inline;
+  cursor: pointer;
+  user-select: none;
+
+  border: 0;
+  background: transparent;
+  padding: 0;
+
+  color: var(--blue);
+  font: inherit;
+  font-weight: 650;
+  line-height: inherit;
+
+  text-decoration: underline;
+  text-decoration-color: rgba(10, 132, 255, 0.45);
+  text-underline-offset: 3px;
+}
+
+.assistant-summary [data-mention-email-id]:hover{
+  text-decoration-color: rgba(10, 132, 255, 0.85);
+}
+
+.assistant-summary [data-mention-email-id]:active{
+  opacity: 0.85;
+}
+
+.assistant-summary [data-mention-email-id]:focus,
+.assistant-summary [data-mention-email-id]:focus-visible{
+  outline: 2px solid rgba(10, 132, 255, 0.35);
+  outline-offset: 2px;
+}
+
+/* Optional container helper if AssistantSummary groups mentions */
+.assistant-mentions{
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
