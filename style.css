@@ -126,13 +126,15 @@ body {
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
+  position: relative;
 }
 
 .email-subject {
   font-weight: 850;
   font-size: 13px;
   line-height: 1.25;
-  max-width: 75%;
+  max-width: calc(100% - 140px);
+  min-width: 0;
 }
 
 .pill {
@@ -360,17 +362,27 @@ body {
 }
 
 .email-tags {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .email-badges {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: flex-end;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .email-top {
@@ -378,6 +390,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
+  position: relative;
 }
 
 .badge-new {
@@ -605,9 +618,56 @@ body {
 
 .assistant-head{
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.assistant-left{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.assistant-avatar{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  object-fit: cover;
+  background: rgba(11, 18, 32, 0.04);
+  flex: 0 0 auto;
+}
+
+.assistant-persona{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.assistant-name{
+  font-weight: 850;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.assistant-tagline{
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.assistant-persona-loading{
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .assistant-title{
@@ -682,3 +742,34 @@ body {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* Iteration 5B — make assistant persona visually primary (overrides) */
+.assistant-left { gap: 12px; }
+
+.assistant-avatar-wrap{
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(11, 18, 32, 0.03);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.assistant-avatar{
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  object-fit: cover;
+  display: block;
+}
+
+.assistant-title-row{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.assistant-ident{ min-width: 0; }

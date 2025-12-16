@@ -13,6 +13,7 @@ import {
   snoozePresetToUntil,
   removeFromTriage,
   loadAssistantSummary,
+  loadAssistantPersona,
 } from "../lib/data.js";
 
 import { qs, on } from "../lib/dom.js";
@@ -26,6 +27,7 @@ import { formatWhen } from "../utils/formatWhen.js";
 
 const DATA_URL = "./data/dashboard_view_model_v1.json";
 const SUMMARY_URL = "./data/assistant_summary_v1.json";
+const PERSONA_URL = "./data/assistant_persona_v1.json";
 
 function panelMeta(category) {
   switch (category) {
@@ -78,6 +80,8 @@ export async function mountApp({ rootId }) {
 
     summary: null,
     isSummaryLoading: false,
+    persona: null,
+    isPersonaLoading: false,
   };
 
   let sortedBlocks = [];
@@ -103,6 +107,20 @@ export async function mountApp({ rootId }) {
         assistant_name: "Inbox Assistant",
         generated_at: new Date().toISOString(),
         briefing: ["Summary is unavailable (missing or unreadable assistant_summary_v1.json)."],
+      };
+    }
+
+    // Mode A: load persona from local JSON
+    try {
+      state.persona = await loadAssistantPersona(PERSONA_URL);
+    } catch (e) {
+      // non-fatal: keep app working
+      state.persona = {
+        assistant_id: "inbox_assistant_v1",
+        name: "Inbox Assistant",
+        tagline: "Your calm, fast morning brief",
+        avatar_url: "./assets/avatar.png",
+        voice: { label: "Listen", status: "stub" },
       };
     }
   }
@@ -139,6 +157,7 @@ export async function mountApp({ rootId }) {
 
     state.isRefreshing = true;
     state.isSummaryLoading = true;
+    state.isPersonaLoading = true;
     render();
 
     window.setTimeout(() => {
@@ -147,6 +166,7 @@ export async function mountApp({ rootId }) {
       if (simulateError) {
         state.isRefreshing = false;
         state.isSummaryLoading = false;
+        state.isPersonaLoading = false;
         showToast("error", "Could not refresh. Please try again.");
         render();
         return;
@@ -161,6 +181,7 @@ export async function mountApp({ rootId }) {
 
       state.isRefreshing = false;
       state.isSummaryLoading = false;
+      state.isPersonaLoading = false;
       showToast("success", "Dashboard updated.");
       render();
     }, 2000);
@@ -310,7 +331,7 @@ export async function mountApp({ rootId }) {
       <div class="toast-host">${toastHtml}</div>
     `;
 
-    const summaryHtml = AssistantSummary({ summary: state.summary, isLoading: state.isSummaryLoading });
+    const summaryHtml = AssistantSummary({ summary: state.summary, isLoading: state.isSummaryLoading, persona: state.persona, isPersonaLoading: state.isPersonaLoading });
 
     const order = ["urgent_attention", "action_required", "documents_to_review", "informational"];
     const panelsHtml = order

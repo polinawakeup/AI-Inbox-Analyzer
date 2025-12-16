@@ -1,8 +1,11 @@
 import { escapeHtml } from "../utils/escapeHtml.js";
 import { formatWhen } from "../utils/formatWhen.js";
 
-export function AssistantSummary({ summary, isLoading = false }) {
-  const name = escapeHtml(summary?.assistant_name || "Inbox Assistant");
+export function AssistantSummary({ summary, isLoading = false, persona = null, isPersonaLoading = false }) {
+  const personaName = escapeHtml(persona?.display_name || summary?.assistant_name || "Inbox Assistant");
+  const personaRole = escapeHtml(persona?.role || "Personal inbox assistant");
+  const personaTagline = escapeHtml(persona?.tagline || "");
+  const personaAvatarUrl = escapeHtml(persona?.avatar_url || "./assets/assistant_avatar.png");
   const when = summary?.generated_at ? escapeHtml(formatWhen(summary.generated_at)) : "—";
 
   const lines = Array.isArray(summary?.briefing) ? summary.briefing : [];
@@ -43,9 +46,23 @@ export function AssistantSummary({ summary, isLoading = false }) {
   return `
     <section class="assistant-summary" aria-label="Inbox Assistant Summary">
       <div class="assistant-head">
-        <div>
-          <div class="assistant-title">${name}</div>
-          <div class="assistant-meta">Generated: ${when}</div>
+        <div class="assistant-left">
+          <div class="assistant-avatar-wrap" aria-hidden="true">
+            <img class="assistant-avatar" src="${personaAvatarUrl}" alt="" />
+          </div>
+
+          <div class="assistant-ident">
+            <div class="assistant-title-row">
+              <div class="assistant-title">${personaName}</div>
+              ${isPersonaLoading ? `<span class="assistant-persona-loading">Loading persona…</span>` : ""}
+            </div>
+
+            ${personaTagline
+              ? `<div class="assistant-tagline">${personaTagline}</div>`
+              : `<div class="assistant-tagline">${personaRole}</div>`}
+
+            <div class="assistant-meta">Generated: ${when}</div>
+          </div>
         </div>
 
         <button class="assistant-listen icon-btn" id="listenSummaryBtn" type="button" title="Listen (stub)">
