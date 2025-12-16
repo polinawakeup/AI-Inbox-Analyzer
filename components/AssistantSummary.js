@@ -8,11 +8,12 @@ export function AssistantSummary({ summary, isLoading = false, persona = null, i
   const personaAvatarUrl = escapeHtml(persona?.avatar_url || "./assets/assistant_avatar.png");
   const when = summary?.generated_at ? escapeHtml(formatWhen(summary.generated_at)) : "—";
 
+  const statusText = isLoading ? "Scanning…" : "Online";
+
   const lines = Array.isArray(summary?.briefing) ? summary.briefing : [];
   const mentions = Array.isArray(summary?.mentions) ? summary.mentions : [];
 
   // Build safe mention replacements on already-escaped text.
-  // We replace occurrences of escaped phrases with a small inline button.
   const normalizedMentions = mentions
     .filter((m) => m && typeof m.phrase === "string" && typeof m.email_id === "string" && m.phrase.trim())
     .map((m) => ({
@@ -20,7 +21,6 @@ export function AssistantSummary({ summary, isLoading = false, persona = null, i
       phraseEsc: escapeHtml(m.phrase),
       emailId: escapeHtml(m.email_id),
     }))
-    // Replace longer phrases first to reduce partial/overlap issues.
     .sort((a, b) => b.phraseEsc.length - a.phraseEsc.length);
 
   function renderLineWithMentions(text) {
@@ -28,7 +28,6 @@ export function AssistantSummary({ summary, isLoading = false, persona = null, i
 
     for (const m of normalizedMentions) {
       if (!m.phraseEsc) continue;
-      // Split/join avoids regex escaping pitfalls.
       const parts = out.split(m.phraseEsc);
       if (parts.length === 1) continue;
 
@@ -54,6 +53,7 @@ export function AssistantSummary({ summary, isLoading = false, persona = null, i
           <div class="assistant-ident">
             <div class="assistant-title-row">
               <div class="assistant-title">${personaName}</div>
+              <span class="assistant-status" aria-label="Assistant status">${escapeHtml(statusText)}</span>
               ${isPersonaLoading ? `<span class="assistant-persona-loading">Loading persona…</span>` : ""}
             </div>
 
@@ -65,8 +65,9 @@ export function AssistantSummary({ summary, isLoading = false, persona = null, i
           </div>
         </div>
 
-        <button class="assistant-listen icon-btn" id="listenSummaryBtn" type="button" title="Listen (stub)">
-          <span class="assistant-listen-icon">🔊</span>
+        <button class="assistant-listen" id="listenSummaryBtn" type="button" title="Listen (stub)">
+          <span class="assistant-listen-icon" aria-hidden="true">🔊</span>
+          <span class="assistant-listen-label">Listen</span>
         </button>
       </div>
 

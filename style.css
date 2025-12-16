@@ -768,8 +768,141 @@ body {
 
 .assistant-title-row{
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
 }
 
 .assistant-ident{ min-width: 0; }
+
+/* ===========================
+   Iteration 5D — Assistant Summary Hero (overrides)
+   =========================== */
+
+.assistant-summary{
+  position: relative;
+  padding: 18px 18px 16px 18px;
+  border-radius: calc(var(--radius) + 10px);
+  background: #fff;
+  border: 1px solid rgba(10, 132, 255, 0.18);
+  /* Soft outer glow (blue), outside only */
+  box-shadow:
+    0 0 0 1px rgba(10, 132, 255, 0.10),
+    0 18px 46px rgba(10, 132, 255, 0.14),
+    0 10px 26px rgba(11, 18, 32, 0.10);
+}
+
+/* Accent strip on the left edge */
+.assistant-summary::before{
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 19px;
+  bottom: 19px;
+  width: 2.5px;
+  border-radius: 999px;
+  background: rgba(10, 132, 255, 0.95);
+  box-shadow: 0 0 18px rgba(10, 132, 255, 0.35);
+  pointer-events: none;
+}
+
+/* More breathing room between hero and the dashboard below */
+.assistant-summary{
+  margin-bottom: 10px;
+}
+
+.assistant-head{
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.assistant-left{
+  gap: 14px;
+}
+
+/* Bigger avatar – persona becomes the anchor */
+.assistant-avatar-wrap{
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  border: 1px solid rgba(11, 18, 32, 0.10);
+  background: rgba(10, 132, 255, 0.06);
+  box-shadow: 0 14px 34px rgba(11, 18, 32, 0.10);
+}
+
+.assistant-avatar{
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  border: 1px solid rgba(11, 18, 32, 0.10);
+}
+
+/* Typography hierarchy */
+.assistant-title{
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.assistant-tagline{
+  font-size: 13px;
+}
+
+.assistant-meta{
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Status pill */
+.assistant-status{
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 650;
+  color: rgba(10, 132, 255, 0.95);
+  background: rgba(10, 132, 255, 0.10);
+  border: 1px solid rgba(10, 132, 255, 0.22);
+}
+
+/* Briefing text slightly larger & more readable */
+.assistant-line{
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Listen button as capsule (stub) */
+.assistant-listen{
+  border: 1px solid rgba(10, 132, 255, 0.18);
+  background: rgba(10, 132, 255, 0.06);
+  color: var(--text);
+  border-radius: 999px;
+  height: 38px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  /* box-shadow: 0 10px 24px rgba(11, 18, 32, 0.08); */
+}
+
+.assistant-listen:hover{
+  background: rgba(10, 132, 255, 0.09);
+}
+
+.assistant-listen:active{
+  transform: translateY(1px);
+}
+
+.assistant-listen-icon{
+  font-size: 16px;
+  line-height: 1;
+}
+
+.assistant-listen-label{
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
