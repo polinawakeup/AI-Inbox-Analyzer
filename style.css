@@ -394,7 +394,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 .header-top {
@@ -586,9 +586,8 @@ body {
   border: 1px solid rgba(10, 132, 255, 0.18);
   margin-bottom: 10px;
   box-shadow:
-    0 0 0 1px rgba(10, 132, 255, 0.10),
-    0 18px 46px rgba(10, 132, 255, 0.14),
-    0 10px 26px rgba(11, 18, 32, 0.10);
+    0 0 0 1px rgba(10, 132, 255, 0.05),
+    0 10px 26px rgba(11, 18, 32, 0.05);
 }
 
 /* Accent strip on the left edge */
@@ -757,7 +756,7 @@ body {
 
 /* Quick intents (primary buttons, bigger spacing) */
 .assistant-intents{
-  margin-top: 18px;
+  margin-top: 24px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
