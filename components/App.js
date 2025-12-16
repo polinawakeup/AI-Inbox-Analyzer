@@ -426,6 +426,25 @@ export async function mountApp({ rootId }) {
           return;
         }
 
+        // Assistant quick intents (stubs)
+        const intentBtn = e.target.closest("[data-assistant-intent]");
+        if (intentBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const id = intentBtn.getAttribute("data-assistant-intent") || "";
+          const labelMap = {
+            draft_replies: "Draft replies",
+            plan_day: "Plan my day",
+            deadlines: "Deadlines overview",
+            ask: "Ask assistant",
+          };
+
+          const label = labelMap[id] || "Assistant action";
+          showToast("success", `Stub: ${label}`);
+          return;
+        }
+
         // Summary mentions -> open the referenced email modal
         const mentionBtn = e.target.closest("[data-mention-email-id]");
         if (mentionBtn) {
