@@ -12,6 +12,7 @@ import {
   applyTriageToBlocks,
   snoozePresetToUntil,
   removeFromTriage,
+  loadAssistantSummary,
 } from "../lib/data.js";
 
 import { qs, on } from "../lib/dom.js";
@@ -20,18 +21,16 @@ import { Panel } from "./Panel.js";
 import { EmailCard } from "./EmailCard.js";
 import { Modal } from "./Modal.js";
 import { TriageStrip } from "./TriageStrip.js";
+import { AssistantSummary } from "./AssistantSummary.js";
 import { formatWhen } from "../utils/formatWhen.js";
 
 const DATA_URL = "./data/dashboard_view_model_v1.json";
+const SUMMARY_URL = "./data/assistant_summary_v1.json";
 
 function panelMeta(category) {
   switch (category) {
     case "urgent_attention":
-      return {
-        title: "Urgent attention",
-        subtitle: "Time-sensitive items with real downside",
-        accentClass: "accent-urgent",
-      };
+      return { title: "Urgent attention", subtitle: "Time-sensitive items with real downside", accentClass: "accent-urgent" };
     case "action_required":
       return { title: "Action required", subtitle: "Replies, decisions, follow-ups", accentClass: "accent-action" };
     case "documents_to_review":
@@ -73,32 +72,39 @@ export async function mountApp({ rootId }) {
     toast: null, // { type: "success"|"error", message: string }
 
     triage: null,
-    collapsed: {
-      snoozed: true,
-      ignored: true,
-      done: true,
-    },
+    collapsed: { snoozed: true, ignored: true, done: true },
 
     snoozeMenu: null, // { emailId, category, left, top }
+
+    summary: null,
+    isSummaryLoading: false,
   };
 
   let sortedBlocks = [];
   let latestMs = 0;
-
-  let eventsWired = false;
 
   async function loadData() {
     const model = await loadDashboardModel(DATA_URL);
     sortedBlocks = getSortedBlocks(model.blocks || []);
     latestMs = getLatestReceivedAt(sortedBlocks);
 
-    // initial last updated = "now" at first successful load
     if (!state.lastUpdatedAtIso) state.lastUpdatedAtIso = new Date().toISOString();
 
-    // triage state load + cleanup
     const now = new Date();
     const triage = cleanupExpiredSnoozes(loadTriageState(), now);
     state.triage = saveTriageState(triage);
+
+    // Mode A: load summary from local JSON
+    try {
+      state.summary = await loadAssistantSummary(SUMMARY_URL);
+    } catch (e) {
+      // non-fatal: keep app working
+      state.summary = {
+        assistant_name: "Inbox Assistant",
+        generated_at: new Date().toISOString(),
+        briefing: ["Summary is unavailable (missing or unreadable assistant_summary_v1.json)."],
+      };
+    }
   }
 
   function renderError(err) {
@@ -120,7 +126,6 @@ export async function mountApp({ rootId }) {
     state.toast = { type, message };
     render();
 
-    // auto-hide
     window.setTimeout(() => {
       if (state.toast && state.toast.type === type && state.toast.message === message) {
         state.toast = null;
@@ -133,21 +138,29 @@ export async function mountApp({ rootId }) {
     if (state.isRefreshing) return;
 
     state.isRefreshing = true;
+    state.isSummaryLoading = true;
     render();
 
-    // Stub: simulate a 2s network request.
     window.setTimeout(() => {
-      const simulateError = false; // keep false for MVP stub
+      const simulateError = false;
 
       if (simulateError) {
         state.isRefreshing = false;
+        state.isSummaryLoading = false;
         showToast("error", "Could not refresh. Please try again.");
         render();
         return;
       }
 
       state.lastUpdatedAtIso = new Date().toISOString();
+
+      // Simulate summary regeneration (Mode A)
+      if (state.summary && typeof state.summary === "object") {
+        state.summary = { ...state.summary, generated_at: new Date().toISOString() };
+      }
+
       state.isRefreshing = false;
+      state.isSummaryLoading = false;
       showToast("success", "Dashboard updated.");
       render();
     }, 2000);
@@ -173,12 +186,6 @@ export async function mountApp({ rootId }) {
       left: Math.max(12, btnRect.left - appRect.left - 180),
       top: Math.max(12, btnRect.bottom - appRect.top + 8),
     };
-    render();
-  }
-
-  function closeSnoozeMenu() {
-    if (!state.snoozeMenu) return;
-    state.snoozeMenu = null;
     render();
   }
 
@@ -247,7 +254,6 @@ export async function mountApp({ rootId }) {
 
   function renderSnoozeMenuHtml() {
     if (!state.snoozeMenu) return "";
-
     const { emailId, left, top } = state.snoozeMenu;
 
     return `
@@ -260,7 +266,6 @@ export async function mountApp({ rootId }) {
   }
 
   function render() {
-    // Ensure triage stays cleaned up over time
     const now = new Date();
     const triageClean = cleanupExpiredSnoozes(state.triage || loadTriageState(), now);
     state.triage = saveTriageState(triageClean);
@@ -279,31 +284,33 @@ export async function mountApp({ rootId }) {
       : "";
 
     const headerHtml = `
-  <header class="header">
-    <div class="header-top">
-      <div class="profile">
-        <img class="avatar" src="./assets/avatar.png" alt="User avatar" />
-        <div class="brand-container">
-          <div class="brand-title">AI Inbox Analyzer</div>
-          <div class="brand-subtitle">Polina • inbox dashboard</div>
+      <header class="header">
+        <div class="header-top">
+          <div class="profile">
+            <img class="avatar" src="./assets/avatar.png" alt="User avatar" />
+            <div class="brand-container">
+              <div class="brand-title">AI Inbox Analyzer</div>
+              <div class="brand-subtitle">Polina • inbox dashboard</div>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="icon-btn" id="refreshBtn" title="Refresh dashboard" ${state.isRefreshing ? "disabled" : ""}>
+              <span class="refresh-icon ${state.isRefreshing ? "spin" : ""}">⟳</span>
+            </button>
+            <div class="last-updated">${lastUpdatedLabel}</div>
+          </div>
         </div>
-      </div>
 
-      <div class="header-actions">
-        <button class="icon-btn" id="refreshBtn" title="Refresh dashboard" ${state.isRefreshing ? "disabled" : ""}>
-          <span class="refresh-icon ${state.isRefreshing ? "spin" : ""}">⟳</span>
-        </button>
-        <div class="last-updated">${lastUpdatedLabel}</div>
-      </div>
-    </div>
+        <div class="header-kpis">
+          ${KPIBar({ counts, total })}
+        </div>
+      </header>
 
-    <div class="header-kpis">
-      ${KPIBar({ counts, total })}
-    </div>
-  </header>
+      <div class="toast-host">${toastHtml}</div>
+    `;
 
-  <div class="toast-host">${toastHtml}</div>
-`;
+    const summaryHtml = AssistantSummary({ summary: state.summary, isLoading: state.isSummaryLoading });
 
     const order = ["urgent_attention", "action_required", "documents_to_review", "informational"];
     const panelsHtml = order
@@ -319,13 +326,7 @@ export async function mountApp({ rootId }) {
 
         const itemsHtml = items.map((it) => EmailCard({ item: it, category: cat })).join("");
 
-        return Panel({
-          title: meta.title,
-          subtitle: meta.subtitle,
-          accentClass: meta.accentClass,
-          itemsHtml,
-          count: items.length,
-        });
+        return Panel({ title: meta.title, subtitle: meta.subtitle, accentClass: meta.accentClass, itemsHtml, count: items.length });
       })
       .join("");
 
@@ -366,38 +367,16 @@ export async function mountApp({ rootId }) {
 
     const triageStripsHtml = `
       <div class="triage-strips">
-        ${TriageStrip({
-          id: "snoozed",
-          title: snoozedMeta.title,
-          subtitle: snoozedMeta.subtitle,
-          count: snoozedItems.length,
-          collapsed: state.collapsed.snoozed,
-          itemsHtml: snoozedHtml,
-        })}
-
-        ${TriageStrip({
-          id: "ignored",
-          title: ignoredMeta.title,
-          subtitle: ignoredMeta.subtitle,
-          count: ignoredItems.length,
-          collapsed: state.collapsed.ignored,
-          itemsHtml: ignoredHtml,
-        })}
-
-        ${TriageStrip({
-          id: "done",
-          title: doneMeta.title,
-          subtitle: doneMeta.subtitle,
-          count: doneItems.length,
-          collapsed: state.collapsed.done,
-          itemsHtml: doneHtml,
-        })}
+        ${TriageStrip({ id: "snoozed", title: snoozedMeta.title, subtitle: snoozedMeta.subtitle, count: snoozedItems.length, collapsed: state.collapsed.snoozed, itemsHtml: snoozedHtml })}
+        ${TriageStrip({ id: "ignored", title: ignoredMeta.title, subtitle: ignoredMeta.subtitle, count: ignoredItems.length, collapsed: state.collapsed.ignored, itemsHtml: ignoredHtml })}
+        ${TriageStrip({ id: "done", title: doneMeta.title, subtitle: doneMeta.subtitle, count: doneItems.length, collapsed: state.collapsed.done, itemsHtml: doneHtml })}
       </div>
     `;
 
     root.innerHTML = `
       <div class="app">
         ${headerHtml}
+        ${summaryHtml}
         <main class="board" id="board">
           ${panelsHtml}
           ${triageStripsHtml}
@@ -413,142 +392,132 @@ export async function mountApp({ rootId }) {
   }
 
   function wireEvents() {
-    if (eventsWired) return;
-    eventsWired = true;
+    const appEl = qs(".app", root);
 
-    // Delegate ALL clicks from the stable root node (root is not replaced on render)
-    on(root, "click", (e) => {
-      // 1) Snooze menu selection (menu lives outside #board, so handle it at root)
-      const snoozePick = e.target.closest("[data-snooze-preset]");
-      if (snoozePick) {
-        e.preventDefault();
-        e.stopPropagation();
-        const preset = snoozePick.getAttribute("data-snooze-preset");
-        const emailId = snoozePick.getAttribute("data-email-id");
-        if (preset && emailId) setSnoozePreset(emailId, preset);
-        return;
-      }
-
-      // 2) Refresh button (re-rendered each time, so delegate)
-      const refreshBtn = e.target.closest("#refreshBtn");
-      if (refreshBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleRefreshClick();
-        return;
-      }
-
-      // 3) Modal close button (delegated)
-      const modalClose = e.target.closest("#modalClose");
-      if (modalClose) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeModal();
-        return;
-      }
-
-      // 4) Backdrop click closes modal (delegated; only if click target IS the backdrop)
-      const backdrop = qs("#modalBackdrop", root);
-      if (backdrop && e.target === backdrop) {
-        closeModal();
-        return;
-      }
-
-      // 5) Triage strip expand/collapse: click anywhere on triage header
-      const triageToggle = e.target.closest(".triage-head[data-triage-toggle]");
-      if (triageToggle) {
-        // Do NOT toggle if the click happened inside an email card (e.g., card buttons)
-        if (e.target.closest(".email-card")) return;
-
-        e.preventDefault();
-        const id = triageToggle.getAttribute("data-triage-toggle");
-        if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
-          state.collapsed[id] = !state.collapsed[id];
-          render();
-        }
-        return;
-      }
-
-      // 6) (Legacy) panel toggle support if still present
-      const toggle = e.target.closest("[data-toggle]");
-      if (toggle) {
-        const id = toggle.getAttribute("data-toggle");
-        if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
-          state.collapsed[id] = !state.collapsed[id];
-          render();
-        }
-        return;
-      }
-
-      // 7) Quick triage buttons (Done / Snooze / Ignore / Restore)
-      const triageBtn = e.target.closest("[data-triage]");
-      if (triageBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        const kind = triageBtn.getAttribute("data-triage");
-        const emailId = triageBtn.getAttribute("data-email-id");
-        if (!kind || !emailId) return;
-
-        // Category is on the closest card
-        const cardEl = triageBtn.closest(".email-card");
-        const category = cardEl?.getAttribute("data-category") || "informational";
-
-        applyTriageAction(kind, emailId, category, triageBtn);
-        return;
-      }
-
-      // 8) Close snooze menu on outside click (but not when clicking snooze button)
-      if (state.snoozeMenu) {
-        const inMenu = e.target.closest(".snooze-menu");
-        const snoozeBtn = e.target.closest('[data-triage="snooze"]');
-        if (!inMenu && !snoozeBtn) {
-          state.snoozeMenu = null;
-          render();
+    if (appEl) {
+      on(appEl, "click", (e) => {
+        // Summary listen stub
+        const listenBtn = e.target.closest("#listenSummaryBtn");
+        if (listenBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          showToast("success", "Voice playback coming soon.");
           return;
         }
-      }
 
-      // 9) Open modal on card click
-      const card = e.target.closest(".email-card");
-      if (!card) return;
+        // Snooze menu selection
+        const snoozePick = e.target.closest("[data-snooze-preset]");
+        if (snoozePick) {
+          e.preventDefault();
+          e.stopPropagation();
+          const preset = snoozePick.getAttribute("data-snooze-preset");
+          const emailId = snoozePick.getAttribute("data-email-id");
+          if (preset && emailId) setSnoozePreset(emailId, preset);
+          return;
+        }
 
-      const emailId = card.getAttribute("data-email-id");
-      const category = card.getAttribute("data-category");
-      if (!emailId || !category) return;
+        // Close snooze menu on outside click
+        const inMenu = e.target.closest(".snooze-menu");
+        const snoozeBtn = e.target.closest('[data-triage="snooze"]');
+        if (state.snoozeMenu && !inMenu && !snoozeBtn) {
+          state.snoozeMenu = null;
+          render();
+        }
+      });
+    }
 
-      let found = findItem(sortedBlocks, category, emailId);
-      let foundCat = category;
+    const board = qs("#board", root);
+    if (board) {
+      on(board, "click", (e) => {
+        const triageToggle = e.target.closest(".triage-head[data-triage-toggle]");
+        if (triageToggle) {
+          const id = triageToggle.getAttribute("data-triage-toggle");
+          if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+            state.collapsed[id] = !state.collapsed[id];
+            render();
+          }
+          return;
+        }
 
-      if (!found) {
-        const any = findAny(sortedBlocks, emailId);
-        if (!any) return;
-        found = any.item;
-        foundCat = any.category;
-      }
+        const toggle = e.target.closest("[data-toggle]");
+        if (toggle) {
+          const id = toggle.getAttribute("data-toggle");
+          if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+            state.collapsed[id] = !state.collapsed[id];
+            render();
+          }
+          return;
+        }
 
-      state.viewedIds.add(emailId);
-      state.isModalOpen = true;
-      state.modalItem = found;
-      state.modalCategory = foundCat;
-      render();
-    });
+        const triageBtn = e.target.closest("[data-triage]");
+        if (triageBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const kind = triageBtn.getAttribute("data-triage");
+          const emailId = triageBtn.getAttribute("data-email-id");
+          if (!kind || !emailId) return;
 
-    // Keyboard support for triage header toggle (Enter/Space)
-    on(root, "keydown", (e) => {
-      const el = e.target;
-      if (!(el instanceof HTMLElement)) return;
-      if (!el.matches(".triage-head[data-triage-toggle]")) return;
-      if (e.key !== "Enter" && e.key !== " ") return;
-      e.preventDefault();
+          const cardEl = triageBtn.closest(".email-card");
+          const category = cardEl?.getAttribute("data-category") || "informational";
 
-      const id = el.getAttribute("data-triage-toggle");
-      if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
-        state.collapsed[id] = !state.collapsed[id];
+          applyTriageAction(kind, emailId, category, triageBtn);
+          return;
+        }
+
+        const card = e.target.closest(".email-card");
+        if (!card) return;
+
+        const emailId = card.getAttribute("data-email-id");
+        const category = card.getAttribute("data-category");
+        if (!emailId || !category) return;
+
+        let found = findItem(sortedBlocks, category, emailId);
+        let foundCat = category;
+
+        if (!found) {
+          const any = findAny(sortedBlocks, emailId);
+          if (!any) return;
+          found = any.item;
+          foundCat = any.category;
+        }
+
+        state.viewedIds.add(emailId);
+        state.isModalOpen = true;
+        state.modalItem = found;
+        state.modalCategory = foundCat;
         render();
-      }
-    });
+      });
 
-    // Escape handling (register once)
+      on(board, "keydown", (e) => {
+        const el = e.target;
+        if (!(el instanceof HTMLElement)) return;
+        if (!el.matches(".triage-head[data-triage-toggle]")) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+
+        const id = el.getAttribute("data-triage-toggle");
+        if (id && Object.prototype.hasOwnProperty.call(state.collapsed, id)) {
+          state.collapsed[id] = !state.collapsed[id];
+          render();
+        }
+      });
+    }
+
+    const refreshBtn = qs("#refreshBtn", root);
+    if (refreshBtn) on(refreshBtn, "click", handleRefreshClick);
+
+    const backdrop = qs("#modalBackdrop", root);
+    const closeBtn = qs("#modalClose", root);
+
+    if (closeBtn) on(closeBtn, "click", closeModal);
+
+    if (backdrop) {
+      on(backdrop, "click", (e) => {
+        if (e.target !== backdrop) return;
+        closeModal();
+      });
+    }
+
     on(window, "keydown", (e) => {
       if (e.key !== "Escape") return;
       if (state.snoozeMenu) {
