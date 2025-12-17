@@ -317,7 +317,7 @@ export async function mountApp({ rootId }) {
 
           <div class="header-actions">
             <button class="icon-btn" id="refreshBtn" title="Refresh dashboard" ${state.isRefreshing ? "disabled" : ""}>
-              <span class="refresh-icon ${state.isRefreshing ? "spin" : ""}">⟳</span>
+              <img class="refresh-icon ${state.isRefreshing ? "spin" : ""}" src="./assets/reload.svg" alt="" />
             </button>
             <div class="last-updated">${lastUpdatedLabel}</div>
           </div>
